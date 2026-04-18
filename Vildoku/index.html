@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Sudoku Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SUDOKU</h1>
+            <div class="status">Zorluk: <span id="difficulty-label">Usta</span></div>
+        </header>
+
+        <div id="sudoku-board" class="board"></div>
+
+        <div class="numpad">
+            <button class="num">1</button><button class="num">2</button><button class="num">3</button>
+            <button class="num">4</button><button class="num">5</button><button class="num">6</button>
+            <button class="num">7</button><button class="num">8</button><button class="num">9</button>
+            <button class="action-btn" id="delete">Sil</button>
+            <button class="action-btn" id="new-game">Yeni Oyun</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+    <script>
+        // Service Worker Kaydı
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js');
+        }
+    </script>
+</body>
+</html>
