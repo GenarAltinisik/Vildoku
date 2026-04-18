@@ -1,0 +1,58 @@
+:root {
+    --bg-color: #121212;
+    --grid-color: #2c2c2c;
+    --text-color: #e0e0e0;
+    --accent-color: #bb86fc;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Courier New', Courier, monospace; /* Akademik hava */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    border: 2px solid var(--text-color);
+    width: 90vw;
+    max-width: 400px;
+    aspect-ratio: 1;
+}
+
+.cell {
+    border: 0.5px solid var(--grid-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* 3x3lük blokları ayırmak için kalın çizgiler */
+.cell:nth-child(3n) { border-right: 2px solid var(--text-color); }
+.cell:nth-child(9n) { border-right: 0.5px solid var(--grid-color); }
+.cell:nth-child(n+19):nth-child(-n+27), 
+.cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--text-color); }
+
+.numpad {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+button {
+    background: #1e1e1e;
+    color: white;
+    border: 1px solid #333;
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 1.1rem;
+}
