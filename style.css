@@ -1,25 +1,25 @@
 :root {
-    --bg: #0f0f0f;
-    --surface: #1e1e1e;
-    --primary: #bb86fc;
-    --secondary: #03dac6;
-    --text: #e0e0e0;
-    --grid: #333;
-    --highlight: #332940;
-    --selected: #4a3461;
-    --error: #cf6679;
+    --bg: #0a0a0c;
+    --surface: #16161a;
+    --primary: #7c4dff; /* Mor Neon */
+    --secondary: #00e5ff; /* Turkuaz Neon */
+    --text: #ffffff;
+    --grid: #2d2d35;
+    --highlight: #2a223a;
+    --selected: #3d2b5e;
+    --error: #ff1744;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
 
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, system-ui, sans-serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     margin: 0;
     display: flex;
     justify-content: center;
-    min-height: 100dvh; /* iOS için dinamik yükseklik */
+    min-height: 100dvh;
 }
 
 .app-container {
@@ -27,31 +27,43 @@ body {
     max-width: 420px;
     display: flex;
     flex-direction: column;
-    padding: 15px;
-    gap: 10px;
+    padding: 20px;
+    gap: 15px;
 }
 
-header h1 { text-align: center; margin: 0 0 10px 0; letter-spacing: 4px; color: var(--primary); }
+header h1 { 
+    text-align: center; 
+    margin: 10px 0; 
+    letter-spacing: 6px; 
+    font-size: 1.8rem;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 5px rgba(124, 77, 255, 0.3));
+}
 
 .stats-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: var(--surface);
-    padding: 10px 15px;
-    border-radius: 12px;
-    font-weight: bold;
+    padding: 12px 18px;
+    border-radius: 15px;
+    border: 1px solid var(--grid);
     font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
 .board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    background: var(--text);
-    border: 2px solid var(--text);
+    background: var(--grid);
+    border: 3px solid var(--grid);
     gap: 1px;
     width: 100%;
     aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .cell {
@@ -59,70 +71,83 @@ header h1 { text-align: center; margin: 0 0 10px 0; letter-spacing: 4px; color: 
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
+    transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.cell:active { transform: scale(0.9); }
-.cell.fixed { font-weight: bold; color: white; }
+.cell.fixed { color: #888; font-weight: 300; }
+.cell.user-val { color: var(--secondary); font-weight: bold; }
 .cell.selected { background: var(--selected); }
 .cell.highlighted { background: var(--highlight); }
-.cell.error { color: var(--error); }
+.cell.error { color: var(--error); background: rgba(255, 23, 68, 0.1); }
 
 /* 3x3 Kalın Çizgiler */
-.cell:nth-child(3n) { border-right: 2px solid var(--text); }
+.cell:nth-child(3n) { border-right: 2px solid var(--grid); }
 .cell:nth-child(9n) { border-right: none; }
-.cell:nth-child(n+19):nth-child(-n+27), 
-.cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--text); }
+.cell:nth-child(n+19):nth-child(-n+27), .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--grid); }
 
 .numpad {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-top: 10px;
+    gap: 10px;
 }
 
 .num-btn {
     background: var(--surface);
     border: 1px solid var(--grid);
     color: var(--text);
-    padding: 12px 0;
-    border-radius: 10px;
+    padding: 15px 0;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    transition: 0.2s;
 }
 
-.num-btn span { font-size: 1.3rem; font-weight: bold; }
-.num-btn sub { font-size: 0.7rem; color: var(--primary); margin-top: 2px; }
-.num-btn.done { opacity: 0.2; pointer-events: none; }
+.num-btn:active { background: var(--primary); transform: translateY(2px); }
+.num-btn span { font-size: 1.4rem; font-weight: 600; }
+.num-btn sub { font-size: 0.7rem; color: var(--secondary); margin-top: 2px; }
+.num-btn.done { opacity: 0.1; pointer-events: none; }
 
-.action-bar { display: flex; gap: 10px; margin-top: 15px; }
+.action-bar { display: flex; gap: 12px; }
 .action-btn {
     flex: 1;
-    padding: 15px;
-    border-radius: 10px;
+    padding: 16px;
+    border-radius: 14px;
     border: none;
-    background: var(--error);
-    color: white;
     font-weight: bold;
+    letter-spacing: 1px;
+    transition: 0.3s;
 }
-.action-btn.secondary { background: var(--secondary); color: black; }
 
-/* Menü */
+.action-btn.delete { background: #261217; color: var(--error); border: 1px solid var(--error); }
+.action-btn.new-game { 
+    background: linear-gradient(135deg, var(--primary), #4e349e); 
+    color: white;
+    box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
+}
+
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.95);
+    background: rgba(0,0,0,0.9);
+    backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 .overlay.hidden { display: none; }
-.modal { background: var(--surface); padding: 30px; border-radius: 24px; text-align: center; width: 85%; }
-.difficulty-picker { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
-.difficulty-picker button { padding: 15px; border-radius: 12px; border: none; background: var(--grid); color: white; font-weight: bold; }
-.resume-btn { width: 100%; margin-top: 10px; padding: 15px; border-radius: 12px; background: var(--primary); border: none; font-weight: bold; }
+.modal { background: var(--surface); padding: 40px 20px; border-radius: 30px; text-align: center; width: 85%; border: 1px solid var(--grid); }
+.diff-btn { 
+    width: 100%; margin-bottom: 10px; padding: 16px; border-radius: 15px; border: 1px solid var(--grid); 
+    background: #1c1c22; color: white; font-weight: bold; transition: 0.2s;
+}
+.diff-btn:hover { border-color: var(--primary); color: var(--primary); }
+.resume-btn { 
+    width: 100%; margin-top: 20px; padding: 18px; border-radius: 15px; 
+    background: var(--secondary); color: black; border: none; font-weight: 900; 
+}
+.icon-btn { background: none; border: none; color: var(--text); font-size: 1.2rem; cursor: pointer; }
 .hidden { display: none; }

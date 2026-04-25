@@ -14,8 +14,9 @@
         <header>
             <h1>VILDOKU</h1>
             <div class="stats-bar">
-                <div class="stat-item">Mod: <span id="difficulty-display">Zor</span></div>
+                <div class="stat-item"><span id="difficulty-display">Zor</span></div>
                 <div class="stat-item"><span id="timer">00:00</span></div>
+                <div class="stat-item" id="lives-container">❤️❤️❤️</div>
                 <button id="pause-btn" class="icon-btn">⏸</button>
             </div>
         </header>
@@ -25,29 +26,24 @@
         <section class="game-ui">
             <div class="numpad" id="numpad"></div>
             <div class="action-bar">
-                <button class="action-btn" id="delete-btn">SİL</button>
-                <button class="action-btn secondary" id="new-game-btn">YENİ OYUN</button>
+                <button class="action-btn delete" id="delete-btn">SİL</button>
+                <button class="action-btn new-game" id="new-game-btn">YENİ OYUN</button>
             </div>
         </section>
 
         <div id="overlay" class="overlay">
             <div class="modal">
                 <h2 id="modal-title">Vildoku</h2>
-                <p>Zorluk Seviyesi Seç:</p>
+                <p id="modal-desc">Zorluk Seviyesi Seç:</p>
                 <div class="difficulty-picker">
-                    <button onclick="game.setDifficulty('easy')">KOLAY</button>
-                    <button onclick="game.setDifficulty('medium')">ORTA</button>
-                    <button onclick="game.setDifficulty('hard')">ZOR</button>
+                    <button class="diff-btn" onclick="game.setDifficulty('easy')">KOLAY</button>
+                    <button class="diff-btn" onclick="game.setDifficulty('medium')">ORTA</button>
+                    <button class="diff-btn" onclick="game.setDifficulty('hard')">ZOR</button>
                 </div>
-                <button id="resume-btn" class="resume-btn hidden">OYUNA DEVAM ET</button>
+                <button id="resume-btn" class="resume-btn hidden">DEVAM ET</button>
             </div>
         </div>
     </div>
     <script src="game.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js');
-        }
-    </script>
 </body>
 </html>
