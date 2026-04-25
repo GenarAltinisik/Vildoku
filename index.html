@@ -9,29 +9,38 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <header>
             <h1>VILDOKU</h1>
-            <div class="status">Zorluk: <span id="difficulty-label">Usta</span></div>
+            <div class="stats-bar">
+                <span id="difficulty-display">Zor</span>
+                <span id="timer">00:00</span>
+                <button id="pause-btn">⏸</button>
+            </div>
         </header>
 
         <div id="sudoku-board" class="board"></div>
 
-        <div class="numpad">
-            <button class="num">1</button><button class="num">2</button><button class="num">3</button>
-            <button class="num">4</button><button class="num">5</button><button class="num">6</button>
-            <button class="num">7</button><button class="num">8</button><button class="num">9</button>
-            <button class="action-btn" id="delete">Sil</button>
-            <button class="action-btn" id="new-game">Yeni Oyun</button>
+        <div class="numpad" id="numpad">
+            </div>
+
+        <div class="controls">
+            <button class="control-btn" id="delete">Sil</button>
+            <button class="control-btn" id="new-game-btn">Yeni Oyun</button>
+        </div>
+
+        <div id="overlay" class="overlay hidden">
+            <div class="modal">
+                <h2 id="modal-title">Duraklatıldı</h2>
+                <div class="difficulty-picker">
+                    <button onclick="game.setDifficulty('easy')">Kolay</button>
+                    <button onclick="game.setDifficulty('medium')">Orta</button>
+                    <button onclick="game.setDifficulty('hard')">Zor</button>
+                </div>
+                <button id="resume-btn" class="main-btn">Devam Et</button>
+            </div>
         </div>
     </div>
-
     <script src="game.js"></script>
-    <script>
-        // Service Worker Kaydı
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js');
-        }
-    </script>
 </body>
 </html>
