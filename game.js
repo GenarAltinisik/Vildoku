@@ -1,173 +1,175 @@
-class SudokuGame {
+class Vildoku {
     constructor() {
-        this.board = Array(81).fill(0);
-        this.solution = Array(81).fill(0);
-        this.selectedCell = null;
-        this.isXSudoku = false; // "Zor Varyant" - Köşegen kontrolü
-        this.difficulty = 'hard'; // 'easy', 'medium', 'hard'
+        this.board = [];
+        this.solution = [];
+        this.fixedIndices = new Set();
+        this.selectedIdx = null;
+        this.difficulty = 'hard';
+        this.seconds = 0;
+        this.timerInterval = null;
+        this.isPaused = false;
 
         this.init();
     }
 
     init() {
-        this.loadGame() || this.createNewGame();
         this.setupEventListeners();
-        this.render();
+        this.newGame();
     }
 
-    // --- MANTIK KATMANI (Sudoku Algoritması) ---
-
-    isValid(board, index, num) {
-        const row = Math.floor(index / 9);
-        const col = index % 9;
-
-        // Satır ve Sütun Kontrolü
-        for (let i = 0; i < 9; i++) {
-            if (board[row * 9 + i] === num) return false;
-            if (board[i * 9 + col] === num) return false;
-        }
-
-        // 3x3 Kutu Kontrolü
-        const startRow = Math.floor(row / 3) * 3;
-        const startCol = Math.floor(col / 3) * 3;
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                if (board[(startRow + i) * 9 + (startCol + j)] === num) return false;
-            }
-        }
-
-        // X-SUDOKU VARYANTI: Köşegen Kontrolü
-        if (this.isXSudoku) {
-            // Ana Köşegen (Sol üst -> Sağ alt)
-            if (row === col) {
-                for (let i = 0; i < 9; i++) {
-                    if (board[i * 9 + i] === num) return false;
-                }
-            }
-            // Ters Köşegen (Sağ üst -> Sol alt)
-            if (row + col === 8) {
-                for (let i = 0; i < 9; i++) {
-                    if (board[i * 9 + (8 - i)] === num) return false;
-                }
-            }
-        }
-
-        return true;
+    setupEventListeners() {
+        document.getElementById('pause-btn').onclick = () => this.pauseGame();
+        document.getElementById('resume-btn').onclick = () => this.resumeGame();
+        document.getElementById('new-game-btn').onclick = () => this.showMenu();
+        document.getElementById('delete').onclick = () => this.inputValue(0);
+        
+        // Klavye desteği (PC testi için)
+        window.onkeydown = (e) => {
+            if (e.key >= 1 && e.key <= 9) this.inputValue(parseInt(e.key));
+            if (e.key === 'Backspace') this.inputValue(0);
+        };
     }
 
-    solve(board) {
-        for (let i = 0; i < 81; i++) {
-            if (board[i] === 0) {
-                const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
-                for (let num of nums) {
-                    if (this.isValid(board, i, num)) {
-                        board[i] = num;
-                        if (this.solve(board)) return true;
-                        board[i] = 0;
-                    }
-                }
-                return false;
-            }
-        }
-        return true;
+    showMenu() {
+        this.pauseGame();
+        document.getElementById('modal-title').textContent = "Yeni Oyun";
+        document.getElementById('overlay').classList.remove('hidden');
     }
 
-    createNewGame() {
+    setDifficulty(level) {
+        this.difficulty = level;
+        document.getElementById('difficulty-display').textContent = level.toUpperCase();
+        this.newGame();
+        this.resumeGame();
+    }
+
+    newGame() {
+        this.seconds = 0;
         this.board = Array(81).fill(0);
-        this.solve(this.board);
+        this.generateSolution();
         this.solution = [...this.board];
-
-        // Zorluk seviyesine göre hücreleri sil (Hard: 55+ hücre silinir)
-        let attempts = this.difficulty === 'hard' ? 55 : 40;
-        while (attempts > 0) {
-            let idx = Math.floor(Math.random() * 81);
-            if (this.board[idx] !== 0) {
+        
+        let removeCount = { 'easy': 35, 'medium': 45, 'hard': 55 }[this.difficulty];
+        this.fixedIndices.clear();
+        
+        // Board'u oluştur
+        for(let i=0; i<81; i++) this.fixedIndices.add(i);
+        while(removeCount > 0) {
+            let idx = Math.floor(Math.random()*81);
+            if(this.board[idx] !== 0) {
                 this.board[idx] = 0;
-                attempts--;
+                this.fixedIndices.delete(idx);
+                removeCount--;
             }
         }
-        this.saveGame();
         this.render();
+        this.startTimer();
     }
 
-    // --- UI KATMANI ---
-
-    render() {
-        const boardEl = document.getElementById('sudoku-board');
-        boardEl.innerHTML = '';
-
-        this.board.forEach((val, i) => {
-            const cell = document.createElement('div');
-            cell.classList.add('cell');
-            if (val !== 0) cell.textContent = val;
-            if (this.selectedCell === i) cell.classList.add('selected');
-            
-            // X-Sudoku görsel ipucu (Köşegenleri hafif renklendir)
-            if (this.isXSudoku && (i % 10 === 0 || i % 8 === 0 && i > 0 && i < 80)) {
-                cell.style.backgroundColor = '#1d1d1d';
+    generateSolution() {
+        const solve = (idx) => {
+            if (idx === 81) return true;
+            let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random()-0.5);
+            for (let n of nums) {
+                if (this.isValid(this.board, idx, n)) {
+                    this.board[idx] = n;
+                    if (solve(idx + 1)) return true;
+                    this.board[idx] = 0;
+                }
             }
-
-            cell.onclick = () => {
-                this.selectedCell = i;
-                this.render();
-            };
-            boardEl.appendChild(cell);
-        });
+            return false;
+        };
+        solve(0);
     }
 
-    handleInput(num) {
-        if (this.selectedCell === null) return;
-        // Eğer hücre orijinal çözümün bir parçasıysa (opsiyonel kısıt eklenebilir)
-        this.board[this.selectedCell] = num;
-        this.saveGame();
+    isValid(board, idx, n) {
+        let r = Math.floor(idx/9), c = idx%9;
+        for (let i=0; i<9; i++) {
+            if (board[r*9+i] === n || board[i*9+c] === n) return false;
+        }
+        let boxR = Math.floor(r/3)*3, boxC = Math.floor(c/3)*3;
+        for (let i=0; i<3; i++) {
+            for (let j=0; j<3; j++) {
+                if (board[(boxR+i)*9+(boxC+j)] === n) return false;
+            }
+        }
+        return true;
+    }
+
+    inputValue(n) {
+        if (this.selectedIdx === null || this.fixedIndices.has(this.selectedIdx) || this.isPaused) return;
+        this.board[this.selectedIdx] = n;
         this.render();
         this.checkWin();
     }
 
-    checkWin() {
-        if (!this.board.includes(0)) {
-            if (JSON.stringify(this.board) === JSON.stringify(this.solution)) {
-                alert("Mükemmel! Hepsini doğru yaptın.");
-            } else {
-                alert("Bazı hatalar var gibi görünüyor...");
-            }
-        }
-    }
+    render() {
+        const boardEl = document.getElementById('sudoku-board');
+        boardEl.innerHTML = '';
+        const selectedVal = this.board[this.selectedIdx];
 
-    // --- SİSTEM ---
-
-    saveGame() {
-        localStorage.setItem('sudoku_save', JSON.stringify({
-            board: this.board,
-            solution: this.solution,
-            isXSudoku: this.isXSudoku
-        }));
-    }
-
-    loadGame() {
-        const saved = localStorage.getItem('sudoku_save');
-        if (saved) {
-            const data = JSON.parse(saved);
-            this.board = data.board;
-            this.solution = data.solution;
-            this.isXSudoku = data.isXSudoku;
-            return true;
-        }
-        return false;
-    }
-
-    setupEventListeners() {
-        // Sayı butonları
-        document.querySelectorAll('.num').forEach(btn => {
-            btn.onclick = () => this.handleInput(parseInt(btn.textContent));
+        this.board.forEach((val, i) => {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            if (val !== 0) cell.textContent = val;
+            if (this.fixedIndices.has(i)) cell.classList.add('fixed');
+            if (this.selectedIdx === i) cell.classList.add('selected');
+            
+            // AYNI SAYILARI PARLATMA
+            if (val !== 0 && val === selectedVal) cell.classList.add('highlighted');
+            
+            cell.onclick = () => { this.selectedIdx = i; this.render(); };
+            boardEl.appendChild(cell);
         });
 
-        document.getElementById('delete').onclick = () => this.handleInput(0);
-        document.getElementById('new-game').onclick = () => {
-            if(confirm("Yeni oyuna geçilsin mi?")) this.createNewGame();
-        };
+        this.renderNumpad();
+    }
+
+    renderNumpad() {
+        const pad = document.getElementById('numpad');
+        pad.innerHTML = '';
+        const counts = {};
+        for(let i=1; i<=9; i++) counts[i] = 0;
+        this.board.forEach(v => { if(v!==0) counts[v]++; });
+
+        for(let i=1; i<=9; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'num-btn';
+            btn.innerHTML = `<span>${i}</span><sub>${9 - counts[i]}</sub>`;
+            btn.onclick = () => this.inputValue(i);
+            if(counts[i] >= 9) btn.style.opacity = "0.3";
+            pad.appendChild(btn);
+        }
+    }
+
+    startTimer() {
+        if(this.timerInterval) clearInterval(this.timerInterval);
+        this.timerInterval = setInterval(() => {
+            if(!this.isPaused) {
+                this.seconds++;
+                const m = Math.floor(this.seconds/60).toString().padStart(2,'0');
+                const s = (this.seconds%60).toString().padStart(2,'0');
+                document.getElementById('timer').textContent = `${m}:${s}`;
+            }
+        }, 1000);
+    }
+
+    pauseGame() {
+        this.isPaused = true;
+        document.getElementById('overlay').classList.remove('hidden');
+    }
+
+    resumeGame() {
+        this.isPaused = false;
+        document.getElementById('overlay').classList.add('hidden');
+    }
+
+    checkWin() {
+        if(!this.board.includes(0) && JSON.stringify(this.board) === JSON.stringify(this.solution)) {
+            alert("Vildoku Tamamlandı! Tebrikler.");
+            this.showMenu();
+        }
     }
 }
 
-// Oyunu Başlat
-window.onload = () => new SudokuGame();
+const game = new Vildoku();
