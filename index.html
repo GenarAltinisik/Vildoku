@@ -2,45 +2,52 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Vildoku</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
     <div class="app-container">
         <header>
             <h1>VILDOKU</h1>
             <div class="stats-bar">
-                <span id="difficulty-display">Zor</span>
-                <span id="timer">00:00</span>
-                <button id="pause-btn">⏸</button>
+                <div class="stat-item">Mod: <span id="difficulty-display">Zor</span></div>
+                <div class="stat-item"><span id="timer">00:00</span></div>
+                <button id="pause-btn" class="icon-btn">⏸</button>
             </div>
         </header>
 
-        <div id="sudoku-board" class="board"></div>
+        <main id="sudoku-board" class="board"></main>
 
-        <div class="numpad" id="numpad">
+        <section class="game-ui">
+            <div class="numpad" id="numpad"></div>
+            <div class="action-bar">
+                <button class="action-btn" id="delete-btn">SİL</button>
+                <button class="action-btn secondary" id="new-game-btn">YENİ OYUN</button>
             </div>
+        </section>
 
-        <div class="controls">
-            <button class="control-btn" id="delete">Sil</button>
-            <button class="control-btn" id="new-game-btn">Yeni Oyun</button>
-        </div>
-
-        <div id="overlay" class="overlay hidden">
+        <div id="overlay" class="overlay">
             <div class="modal">
-                <h2 id="modal-title">Duraklatıldı</h2>
+                <h2 id="modal-title">Vildoku</h2>
+                <p>Zorluk Seviyesi Seç:</p>
                 <div class="difficulty-picker">
-                    <button onclick="game.setDifficulty('easy')">Kolay</button>
-                    <button onclick="game.setDifficulty('medium')">Orta</button>
-                    <button onclick="game.setDifficulty('hard')">Zor</button>
+                    <button onclick="game.setDifficulty('easy')">KOLAY</button>
+                    <button onclick="game.setDifficulty('medium')">ORTA</button>
+                    <button onclick="game.setDifficulty('hard')">ZOR</button>
                 </div>
-                <button id="resume-btn" class="main-btn">Devam Et</button>
+                <button id="resume-btn" class="resume-btn hidden">OYUNA DEVAM ET</button>
             </div>
         </div>
     </div>
     <script src="game.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js');
+        }
+    </script>
 </body>
 </html>
