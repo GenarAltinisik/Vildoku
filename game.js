@@ -75,11 +75,12 @@ class Vildoku {
                 this.generateCages();
                 this.board = Array(this.size * this.size).fill(0); 
                 
-                // OTOMATİK DOLDURMA KODU: 1 hücreli kafesleri oyun başında doğru sayıyla doldurur
+                // OTOMATİK DOLDURMA KODU (Sabit İndekslere Eklendi)
                 this.cages.forEach(cage => {
                     if (cage.cells.length === 1) {
                         let cellIdx = cage.cells[0];
                         this.board[cellIdx] = this.solution[cellIdx];
+                        this.fixedIndices.add(cellIdx); // Silinmesini engeller!
                     }
                 });
             } else {
@@ -343,11 +344,12 @@ class Vildoku {
             difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
             size: this.size, sqrt: this.sqrt, cages: this.cages
         };
-        localStorage.setItem('vildoku_v11_save', JSON.stringify(state));
+        /* KAYIT ANAHTARI DEĞİŞTİRİLDİ Kİ ESKİ OYUN YÜKLENMESİN */
+        localStorage.setItem('vildoku_v12_save', JSON.stringify(state));
     }
 
     loadGame() {
-        const saved = localStorage.getItem('vildoku_v11_save');
+        const saved = localStorage.getItem('vildoku_v12_save');
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -410,7 +412,7 @@ class Vildoku {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
                 alert(`Congratulations Vildan! You mastered the ${this.mode.toUpperCase()} mode!`);
-                localStorage.removeItem('vildoku_v11_save');
+                localStorage.removeItem('vildoku_v12_save');
                 this.showNewGameMenu(true);
             }, 100);
         }
