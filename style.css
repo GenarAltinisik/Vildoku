@@ -48,6 +48,7 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
 .board {
     position: absolute; inset: 0; display: grid;
     grid-template-columns: repeat(var(--grid-size), 1fr);
+    grid-template-rows: repeat(var(--grid-size), 1fr); /* SATIR KAYMASINI ENGELLEYEN KOD */
     background: var(--surface); border: 2px solid var(--grid-thick);
 }
 
@@ -64,7 +65,6 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
 .cell.fixed { color: var(--text); font-weight: normal; }
 .cell.user-val { color: var(--primary); font-weight: bold; }
 
-/* Seçim ve vurguların pastel renkleri ezmemesi için !important kullanıldı */
 .cell.selected { background: var(--selected) !important; }
 .cell.highlighted { background: var(--highlight) !important; }
 .cell.error { color: var(--error); background: var(--error-bg) !important; }
@@ -72,17 +72,17 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
 .thick-right { border-right: 2px solid var(--grid-thick) !important; }
 .thick-bottom { border-bottom: 2px solid var(--grid-thick) !important; }
 
-/* PASTEL KAFES RENKLERİ (Dark modda sırıtmayacak transparanlıkta) */
-.cage-color-0 { background-color: rgba(255, 179, 186, 0.15); } /* Pastel Kırmızı/Gül */
-.cage-color-1 { background-color: rgba(255, 223, 186, 0.15); } /* Pastel Turuncu */
-.cage-color-2 { background-color: rgba(255, 255, 186, 0.15); } /* Pastel Sarı */
-.cage-color-3 { background-color: rgba(186, 255, 201, 0.15); } /* Pastel Yeşil */
-.cage-color-4 { background-color: rgba(186, 225, 255, 0.15); } /* Pastel Mavi */
-.cage-color-5 { background-color: rgba(210, 186, 255, 0.15); } /* Pastel Mor */
-.cage-color-6 { background-color: rgba(255, 186, 255, 0.15); } /* Pastel Pembe */
-.cage-color-7 { background-color: rgba(186, 255, 255, 0.15); } /* Pastel Turkuaz */
-.cage-color-8 { background-color: rgba(220, 220, 220, 0.15); } /* Gümüş */
-.cage-color-9 { background-color: rgba(255, 204, 153, 0.15); } /* Şeftali */
+/* PASTEL KAFES RENKLERİ */
+.cage-color-0 { background-color: rgba(255, 179, 186, 0.15); } 
+.cage-color-1 { background-color: rgba(255, 223, 186, 0.15); } 
+.cage-color-2 { background-color: rgba(255, 255, 186, 0.15); } 
+.cage-color-3 { background-color: rgba(186, 255, 201, 0.15); } 
+.cage-color-4 { background-color: rgba(186, 225, 255, 0.15); } 
+.cage-color-5 { background-color: rgba(210, 186, 255, 0.15); } 
+.cage-color-6 { background-color: rgba(255, 186, 255, 0.15); } 
+.cage-color-7 { background-color: rgba(186, 255, 255, 0.15); } 
+.cage-color-8 { background-color: rgba(220, 220, 220, 0.15); } 
+.cage-color-9 { background-color: rgba(255, 204, 153, 0.15); } 
 
 /* Kafes Çizgileri */
 .cage-b-r::after {
