@@ -5,7 +5,7 @@ class Vildoku {
         this.board = [];
         this.solution = [];
         this.fixedIndices = new Set();
-        this.cages = []; // Yeni Kafes Dizisi
+        this.cages = [];
         this.selectedIdx = null;
         this.difficulty = 'medium';
         this.mode = 'classic';
@@ -73,7 +73,6 @@ class Vildoku {
 
             if (this.mode === 'cage') {
                 this.generateCages();
-                // Cage modunda oyuncuya boş tahta verilir
                 this.board = Array(this.size * this.size).fill(0); 
             } else {
                 const rates = {
@@ -102,7 +101,6 @@ class Vildoku {
         }, 50);
     }
 
-    // SVG ve Bölgeleme Mantığı İçin Kafes Üretici
     generateCages() {
         let visited = new Set();
         let cells = Array.from({length: 81}, (_, i) => i).sort(() => Math.random() - 0.5);
@@ -110,7 +108,7 @@ class Vildoku {
         for (let i of cells) {
             if (visited.has(i)) continue;
 
-            let targetSize = Math.floor(Math.random() * 4) + 2; // 2 ile 5 hücre arası
+            let targetSize = Math.floor(Math.random() * 4) + 2;
             let currentCage = [i];
             visited.add(i);
 
@@ -221,26 +219,34 @@ class Vildoku {
             if ((c + 1) % this.sqrt === 0 && c !== this.size - 1) cell.classList.add('thick-right');
             if ((r + 1) % this.sqrt === 0 && r !== this.size - 1) cell.classList.add('thick-bottom');
 
-            // Cage Etiketi Ekleme
+            // Yeni CSS Tabanlı Cage Sınırları
             if (this.mode === 'cage') {
-                let cage = this.cages.find(cg => cg.labelCell === i);
-                if (cage) {
+                let myCage = this.getCageId(i);
+                
+                if (c < this.size - 1 && myCage !== this.getCageId(i + 1)) {
+                    cell.classList.add('cage-b-r');
+                }
+                if (r < this.size - 1 && myCage !== this.getCageId(i + this.size)) {
+                    cell.classList.add('cage-b-b');
+                }
+
+                let cageObj = this.cages.find(cg => cg.labelCell === i);
+                if (cageObj) {
                     let sumSpan = document.createElement('span');
                     sumSpan.className = 'cage-sum';
-                    sumSpan.id = `cage-label-${cage.id}`;
-                    sumSpan.textContent = cage.targetSum;
-                    
-                    // Kafes tam dolu ve doğruysa görsel geribildirim
-                    let isFull = cage.cells.every(idx => this.board[idx] !== 0);
+                    sumSpan.textContent = cageObj.targetSum;
+                    let isFull = cageObj.cells.every(idx => this.board[idx] !== 0);
                     if (isFull) sumSpan.classList.add('cage-done');
-                    
                     cell.appendChild(sumSpan);
                 }
             }
 
             if (val !== 0) {
-                const textNode = document.createTextNode(this.valToChar(val));
-                cell.appendChild(textNode);
+                let valSpan = document.createElement('span');
+                valSpan.className = 'cell-value';
+                valSpan.textContent = this.valToChar(val);
+                cell.appendChild(valSpan);
+                
                 cell.classList.add(this.fixedIndices.has(i) ? 'fixed' : 'user-val');
                 if (val !== this.solution[i]) cell.classList.add('error');
             }
@@ -252,39 +258,7 @@ class Vildoku {
             boardEl.appendChild(cell);
         });
 
-        this.renderCagesSVG();
         this.updateNumpad();
-    }
-
-    renderCagesSVG() {
-        const svg = document.getElementById('cage-layer');
-        svg.innerHTML = '';
-        if (this.mode !== 'cage') return;
-
-        // CSS Grid ile 1'e 1 eşleşen sanal bir düzlem
-        svg.setAttribute('viewBox', '0 0 90 90');
-
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-                let i = r * 9 + c;
-                let myCage = this.getCageId(i);
-
-                if (c < 8 && myCage !== this.getCageId(i + 1)) {
-                    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute('x1', (c + 1) * 10); line.setAttribute('y1', r * 10);
-                    line.setAttribute('x2', (c + 1) * 10); line.setAttribute('y2', (r + 1) * 10);
-                    line.setAttribute('class', 'cage-line');
-                    svg.appendChild(line);
-                }
-                if (r < 8 && myCage !== this.getCageId(i + 9)) {
-                    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute('x1', c * 10); line.setAttribute('y1', (r + 1) * 10);
-                    line.setAttribute('x2', (c + 1) * 10); line.setAttribute('y2', (r + 1) * 10);
-                    line.setAttribute('class', 'cage-line');
-                    svg.appendChild(line);
-                }
-            }
-        }
     }
 
     valToChar(v) {
@@ -325,11 +299,11 @@ class Vildoku {
             difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
             size: this.size, sqrt: this.sqrt, cages: this.cages
         };
-        localStorage.setItem('vildoku_v6_save', JSON.stringify(state));
+        localStorage.setItem('vildoku_v7_save', JSON.stringify(state));
     }
 
     loadGame() {
-        const saved = localStorage.getItem('vildoku_v6_save');
+        const saved = localStorage.getItem('vildoku_v7_save');
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -388,7 +362,7 @@ class Vildoku {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
                 alert(`Congratulations Vildan! You mastered the ${this.mode.toUpperCase()} mode!`);
-                localStorage.removeItem('vildoku_v6_save');
+                localStorage.removeItem('vildoku_v7_save');
                 this.showNewGameMenu(true);
             }, 100);
         }
