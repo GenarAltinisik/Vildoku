@@ -111,16 +111,16 @@ class Vildoku {
             let targetSize;
             let r = Math.random();
             
-            // YENİ ZORLUK ALGORİTMASI
+            // YENİ, DAHA İNSAFLI ZORLUK ALGORİTMASI
             if (this.difficulty === 'easy') {
-                // Easy: %15 ihtimalle 1 hücre (ipucu), %60 2 hücre, %25 3 hücre
-                targetSize = r < 0.15 ? 1 : (r < 0.75 ? 2 : 3);
+                // Easy: %40 ipucu (1 hücre), %45 2 hücre, %15 3 hücre
+                targetSize = r < 0.40 ? 1 : (r < 0.85 ? 2 : 3);
             } else if (this.difficulty === 'medium') {
-                // Medium: %50 2 hücre, %40 3 hücre, %10 4 hücre
-                targetSize = r < 0.50 ? 2 : (r < 0.90 ? 3 : 4);
+                // Medium: %15 ipucu (1 hücre), %50 2 hücre, %30 3 hücre, %5 4 hücre
+                targetSize = r < 0.15 ? 1 : (r < 0.65 ? 2 : (r < 0.95 ? 3 : 4));
             } else {
-                // Hard: %20 2 hücre, %40 3 hücre, %30 4 hücre, %10 5 hücre
-                targetSize = r < 0.20 ? 2 : (r < 0.60 ? 3 : (r < 0.90 ? 4 : 5));
+                // Hard: %0 ipucu, %50 2 hücre, %35 3 hücre, %13 4 hücre, %2 5 hücre
+                targetSize = r < 0.50 ? 2 : (r < 0.85 ? 3 : (r < 0.98 ? 4 : 5));
             }
 
             let currentCage = [i];
@@ -339,11 +339,11 @@ class Vildoku {
             difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
             size: this.size, sqrt: this.sqrt, cages: this.cages
         };
-        localStorage.setItem('vildoku_v10_save', JSON.stringify(state));
+        localStorage.setItem('vildoku_v11_save', JSON.stringify(state));
     }
 
     loadGame() {
-        const saved = localStorage.getItem('vildoku_v10_save');
+        const saved = localStorage.getItem('vildoku_v11_save');
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -406,7 +406,7 @@ class Vildoku {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
                 alert(`Congratulations Vildan! You mastered the ${this.mode.toUpperCase()} mode!`);
-                localStorage.removeItem('vildoku_v10_save');
+                localStorage.removeItem('vildoku_v11_save');
                 this.showNewGameMenu(true);
             }, 100);
         }
