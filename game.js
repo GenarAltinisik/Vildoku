@@ -9,7 +9,7 @@ class Vildoku {
         this.difficulty = 'medium';
         this.mode = 'classic';
         this.seconds = 0;
-        this.lives = 3; // Başlangıç canı (3/3)
+        this.mistakes = 0; // Hata sayısı 0'dan 3'e gidecek
         this.timerInterval = null;
         this.isPaused = true;
 
@@ -19,16 +19,18 @@ class Vildoku {
     init() {
         this.setupEventListeners();
         if (!this.loadGame()) {
-            this.showMenu();
+            this.showNewGameMenu(true); // Kayıt yoksa iptal edilemeyen yeni oyun menüsünü aç
         } else {
             this.resumeGame();
         }
     }
 
     setupEventListeners() {
-        document.getElementById('pause-btn').onclick = () => this.pauseGame();
+        document.getElementById('pause-btn').onclick = () => this.showPauseMenu();
         document.getElementById('resume-btn').onclick = () => this.resumeGame();
-        document.getElementById('new-game-btn').onclick = () => this.showMenu();
+        document.getElementById('show-new-game-btn').onclick = () => this.showNewGameMenu(false);
+        document.getElementById('start-new-btn').onclick = () => this.startNewGame();
+        document.getElementById('cancel-new-btn').onclick = () => this.showPauseMenu();
         document.getElementById('delete-btn').onclick = () => this.inputValue(0);
         
         document.getElementById('btn-classic').onclick = () => this.selectMode('classic');
@@ -41,27 +43,24 @@ class Vildoku {
         this.sqrt = Math.sqrt(this.size);
         document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-${mode}`).classList.add('active');
-        document.getElementById('mode-display').textContent = `${this.size}x${this.size}`;
         document.documentElement.style.setProperty('--grid-size', this.size);
+        document.body.setAttribute('data-size', this.size);
     }
 
     selectDifficulty(level) {
         this.difficulty = level;
         document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-        // Butonların içeriğine göre active class'ını ekle
         document.querySelectorAll('.diff-btn').forEach(b => {
             if(b.textContent.toLowerCase() === level) b.classList.add('active');
         });
-        
-        this.newGame();
-        this.resumeGame();
     }
 
-    newGame() {
+    startNewGame() {
         this.seconds = 0;
-        this.lives = 3; // Yeni oyunda can sıfırlanır
+        this.mistakes = 0;
         this.board = Array(this.size * this.size).fill(0);
         
+        document.getElementById('new-game-view').classList.add('hidden');
         document.getElementById('modal-title').textContent = "Generating puzzle...";
         
         setTimeout(() => {
@@ -86,11 +85,11 @@ class Vildoku {
                 }
             }
             
+            document.getElementById('mode-display').textContent = `${this.size}x${this.size}`;
             document.getElementById('diff-display').textContent = this.difficulty.toUpperCase();
             this.updateLivesDisplay();
             this.saveGame();
             this.render();
-            this.startTimer();
             this.resumeGame();
         }, 50);
     }
@@ -132,12 +131,12 @@ class Vildoku {
         if (this.selectedIdx === null || this.fixedIndices.has(this.selectedIdx) || this.isPaused) return;
 
         if (n !== 0 && n !== this.solution[this.selectedIdx]) {
-            this.lives--;
+            this.mistakes++;
             this.updateLivesDisplay();
-            if (this.lives <= 0) {
+            if (this.mistakes >= 3) {
                 setTimeout(() => {
-                    alert("Game Over! No more chances left. Let's start a new game.");
-                    this.showMenu();
+                    alert("Game Over! 3/3 mistakes made. Let's try again.");
+                    this.showNewGameMenu(true);
                 }, 100);
                 return;
             }
@@ -211,14 +210,14 @@ class Vildoku {
     saveGame() {
         const state = {
             board: this.board, solution: this.solution, fixedIndices: Array.from(this.fixedIndices),
-            difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, lives: this.lives,
+            difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
             size: this.size, sqrt: this.sqrt
         };
-        localStorage.setItem('vildoku_en_save', JSON.stringify(state));
+        localStorage.setItem('vildoku_v5_save', JSON.stringify(state));
     }
 
     loadGame() {
-        const saved = localStorage.getItem('vildoku_en_save');
+        const saved = localStorage.getItem('vildoku_v5_save');
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -227,11 +226,12 @@ class Vildoku {
         this.difficulty = data.difficulty;
         this.mode = data.mode || 'classic';
         this.seconds = data.seconds;
-        this.lives = data.lives;
+        this.mistakes = data.mistakes || 0;
         this.size = data.size || 9;
         this.sqrt = data.sqrt || 3;
         
         this.selectMode(this.mode);
+        document.getElementById('mode-display').textContent = `${this.size}x${this.size}`;
         document.getElementById('diff-display').textContent = this.difficulty.toUpperCase();
         this.updateLivesDisplay();
         this.render();
@@ -239,15 +239,31 @@ class Vildoku {
     }
 
     updateLivesDisplay() {
-        // Can 3/3 ten 0/3'e doğru sayacak
-        document.getElementById('lives-container').textContent = `Mistakes Left: ${this.lives}/3`;
+        document.getElementById('lives-container').textContent = `Mistakes: ${this.mistakes}/3`;
     }
 
-    pauseGame() {
+    showPauseMenu() {
         this.isPaused = true;
-        document.getElementById('modal-title').textContent = "Paused";
-        document.getElementById('resume-btn').classList.remove('hidden');
+        document.getElementById('modal-title').textContent = "PAUSED";
+        document.getElementById('pause-view').classList.remove('hidden');
+        document.getElementById('new-game-view').classList.add('hidden');
         document.getElementById('overlay').classList.remove('hidden');
+    }
+
+    showNewGameMenu(forceNew = false) {
+        document.getElementById('modal-title').textContent = "NEW GAME";
+        document.getElementById('pause-view').classList.add('hidden');
+        document.getElementById('new-game-view').classList.remove('hidden');
+        
+        // Eğer zorunluysa (oyun başı veya can bitişi) iptal etme butonunu gizle
+        if(forceNew) {
+            document.getElementById('cancel-new-btn').classList.add('hidden');
+        } else {
+            document.getElementById('cancel-new-btn').classList.remove('hidden');
+        }
+
+        this.selectMode(this.mode);
+        this.selectDifficulty(this.difficulty);
     }
 
     resumeGame() {
@@ -256,27 +272,12 @@ class Vildoku {
         this.startTimer();
     }
 
-    showMenu() {
-        this.pauseGame();
-        document.getElementById('modal-title').textContent = "Game Menu";
-        document.getElementById('resume-btn').classList.add('hidden');
-        this.selectMode(this.mode);
-        
-        document.querySelectorAll('.diff-btn').forEach(b => {
-            if(b.textContent.toLowerCase() === this.difficulty) {
-                b.classList.add('active');
-            } else {
-                b.classList.remove('active');
-            }
-        });
-    }
-
     checkWin() {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
-                alert(`Congratulations Vildan! You've solved the ${this.size}x${this.size} puzzle.`);
-                localStorage.removeItem('vildoku_en_save');
-                this.showMenu();
+                alert(`Congratulations Vildan! You solved it!`);
+                localStorage.removeItem('vildoku_v5_save');
+                this.showNewGameMenu(true);
             }, 100);
         }
     }
