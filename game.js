@@ -74,6 +74,14 @@ class Vildoku {
             if (this.mode === 'cage') {
                 this.generateCages();
                 this.board = Array(this.size * this.size).fill(0); 
+                
+                // OTOMATİK DOLDURMA KODU: 1 hücreli kafesleri oyun başında doğru sayıyla doldurur
+                this.cages.forEach(cage => {
+                    if (cage.cells.length === 1) {
+                        let cellIdx = cage.cells[0];
+                        this.board[cellIdx] = this.solution[cellIdx];
+                    }
+                });
             } else {
                 const rates = {
                     'classic': { 'easy': 0.4, 'medium': 0.5, 'hard': 0.65 },
@@ -111,15 +119,11 @@ class Vildoku {
             let targetSize;
             let r = Math.random();
             
-            // YENİ, DAHA İNSAFLI ZORLUK ALGORİTMASI
             if (this.difficulty === 'easy') {
-                // Easy: %40 ipucu (1 hücre), %45 2 hücre, %15 3 hücre
                 targetSize = r < 0.40 ? 1 : (r < 0.85 ? 2 : 3);
             } else if (this.difficulty === 'medium') {
-                // Medium: %15 ipucu (1 hücre), %50 2 hücre, %30 3 hücre, %5 4 hücre
                 targetSize = r < 0.15 ? 1 : (r < 0.65 ? 2 : (r < 0.95 ? 3 : 4));
             } else {
-                // Hard: %0 ipucu, %50 2 hücre, %35 3 hücre, %13 4 hücre, %2 5 hücre
                 targetSize = r < 0.50 ? 2 : (r < 0.85 ? 3 : (r < 0.98 ? 4 : 5));
             }
 
