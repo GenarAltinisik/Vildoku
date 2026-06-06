@@ -108,16 +108,30 @@ class Vildoku {
         for (let i of cells) {
             if (visited.has(i)) continue;
 
-            let targetSize = Math.floor(Math.random() * 4) + 2;
+            let targetSize;
+            let r = Math.random();
+            
+            // YENİ ZORLUK ALGORİTMASI
+            if (this.difficulty === 'easy') {
+                // Easy: %15 ihtimalle 1 hücre (ipucu), %60 2 hücre, %25 3 hücre
+                targetSize = r < 0.15 ? 1 : (r < 0.75 ? 2 : 3);
+            } else if (this.difficulty === 'medium') {
+                // Medium: %50 2 hücre, %40 3 hücre, %10 4 hücre
+                targetSize = r < 0.50 ? 2 : (r < 0.90 ? 3 : 4);
+            } else {
+                // Hard: %20 2 hücre, %40 3 hücre, %30 4 hücre, %10 5 hücre
+                targetSize = r < 0.20 ? 2 : (r < 0.60 ? 3 : (r < 0.90 ? 4 : 5));
+            }
+
             let currentCage = [i];
             visited.add(i);
 
             while (currentCage.length < targetSize) {
                 let neighbors = [];
                 for (let c of currentCage) {
-                    let r = Math.floor(c / 9), col = c % 9;
-                    if (r > 0 && !visited.has(c - 9)) neighbors.push(c - 9);
-                    if (r < 8 && !visited.has(c + 9)) neighbors.push(c + 9);
+                    let rIdx = Math.floor(c / 9), col = c % 9;
+                    if (rIdx > 0 && !visited.has(c - 9)) neighbors.push(c - 9);
+                    if (rIdx < 8 && !visited.has(c + 9)) neighbors.push(c + 9);
                     if (col > 0 && !visited.has(c - 1)) neighbors.push(c - 1);
                     if (col < 8 && !visited.has(c + 1)) neighbors.push(c + 1);
                 }
@@ -145,7 +159,6 @@ class Vildoku {
             });
         }
 
-        // Yan yana gelen kafeslerin aynı renkte olmasını engelleyen Graph Coloring Algoritması
         this.cages.forEach(cage => {
             let adjacentColors = new Set();
             cage.cells.forEach(cellIdx => {
@@ -166,7 +179,7 @@ class Vildoku {
 
             let color = 0;
             while(adjacentColors.has(color)) color++;
-            cage.colorIndex = color % 10; // CSS'te hazırladığımız 10 farklı pastel renk
+            cage.colorIndex = color % 10;
         });
     }
 
@@ -247,7 +260,6 @@ class Vildoku {
                 let myCageObj = this.cages.find(cg => cg.cells.includes(i));
                 let myCage = myCageObj ? myCageObj.id : -1;
                 
-                // Arkaplana Atanmış Pastel Rengi Ekle
                 if (myCageObj !== undefined) {
                     cell.classList.add(`cage-color-${myCageObj.colorIndex}`);
                 }
@@ -327,11 +339,11 @@ class Vildoku {
             difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
             size: this.size, sqrt: this.sqrt, cages: this.cages
         };
-        localStorage.setItem('vildoku_v9_save', JSON.stringify(state));
+        localStorage.setItem('vildoku_v10_save', JSON.stringify(state));
     }
 
     loadGame() {
-        const saved = localStorage.getItem('vildoku_v9_save');
+        const saved = localStorage.getItem('vildoku_v10_save');
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -394,7 +406,7 @@ class Vildoku {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
                 alert(`Congratulations Vildan! You mastered the ${this.mode.toUpperCase()} mode!`);
-                localStorage.removeItem('vildoku_v9_save');
+                localStorage.removeItem('vildoku_v10_save');
                 this.showNewGameMenu(true);
             }, 100);
         }
