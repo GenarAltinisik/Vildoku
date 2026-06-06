@@ -17,13 +17,16 @@
                 <button id="pause-btn" class="text-icon-btn">PAUSE</button>
             </div>
             <div class="stats-bar">
-                <div class="stat-item"><span id="mode-display">9x9</span> | <span id="diff-display">HARD</span></div>
+                <div class="stat-item"><span id="mode-display">CLASSIC</span> | <span id="diff-display">HARD</span></div>
                 <div class="stat-item"><span id="timer">00:00</span></div>
                 <div class="stat-item" id="lives-container">Mistakes: 0/3</div>
             </div>
         </header>
 
-        <main id="sudoku-board" class="board"></main>
+        <main class="board-container">
+            <div id="sudoku-board" class="board"></div>
+            <svg id="cage-layer"></svg>
+        </main>
 
         <section class="game-ui">
             <div class="numpad" id="numpad"></div>
@@ -45,7 +48,8 @@
                     <p class="menu-label">Select Game Mode:</p>
                     <div class="picker-group">
                         <button class="menu-btn" id="btn-classic">CLASSIC (9x9)</button>
-                        <button class="menu-btn" id="btn-hex">HEXADECIMAL (16x16)</button>
+                        <button class="menu-btn" id="btn-hex">HEX (16x16)</button>
+                        <button class="menu-btn" id="btn-cage">CAGE (9x9)</button>
                     </div>
                     
                     <p class="menu-label">Select Difficulty:</p>

@@ -5,11 +5,12 @@ class Vildoku {
         this.board = [];
         this.solution = [];
         this.fixedIndices = new Set();
+        this.cages = []; // Yeni Kafes Dizisi
         this.selectedIdx = null;
         this.difficulty = 'medium';
         this.mode = 'classic';
         this.seconds = 0;
-        this.mistakes = 0; // Hata sayısı 0'dan 3'e gidecek
+        this.mistakes = 0;
         this.timerInterval = null;
         this.isPaused = true;
 
@@ -19,7 +20,7 @@ class Vildoku {
     init() {
         this.setupEventListeners();
         if (!this.loadGame()) {
-            this.showNewGameMenu(true); // Kayıt yoksa iptal edilemeyen yeni oyun menüsünü aç
+            this.showNewGameMenu(true);
         } else {
             this.resumeGame();
         }
@@ -35,6 +36,7 @@ class Vildoku {
         
         document.getElementById('btn-classic').onclick = () => this.selectMode('classic');
         document.getElementById('btn-hex').onclick = () => this.selectMode('hex');
+        document.getElementById('btn-cage').onclick = () => this.selectMode('cage');
     }
 
     selectMode(mode) {
@@ -59,6 +61,7 @@ class Vildoku {
         this.seconds = 0;
         this.mistakes = 0;
         this.board = Array(this.size * this.size).fill(0);
+        this.cages = [];
         
         document.getElementById('new-game-view').classList.add('hidden');
         document.getElementById('modal-title').textContent = "Generating puzzle...";
@@ -66,32 +69,89 @@ class Vildoku {
         setTimeout(() => {
             this.generateFullSolution();
             this.solution = [...this.board];
-            
-            const rates = {
-                'classic': { 'easy': 0.4, 'medium': 0.5, 'hard': 0.65 },
-                'hex': { 'easy': 0.3, 'medium': 0.4, 'hard': 0.5 }
-            };
-            
-            let toRemove = Math.floor(this.board.length * rates[this.mode][this.difficulty]);
             this.fixedIndices.clear();
-            for(let i=0; i<this.board.length; i++) this.fixedIndices.add(i);
 
-            while(toRemove > 0) {
-                let idx = Math.floor(Math.random() * this.board.length);
-                if(this.board[idx] !== 0) {
-                    this.board[idx] = 0;
-                    this.fixedIndices.delete(idx);
-                    toRemove--;
+            if (this.mode === 'cage') {
+                this.generateCages();
+                // Cage modunda oyuncuya boş tahta verilir
+                this.board = Array(this.size * this.size).fill(0); 
+            } else {
+                const rates = {
+                    'classic': { 'easy': 0.4, 'medium': 0.5, 'hard': 0.65 },
+                    'hex': { 'easy': 0.3, 'medium': 0.4, 'hard': 0.5 }
+                };
+                let toRemove = Math.floor(this.board.length * rates[this.mode][this.difficulty]);
+                for(let i=0; i<this.board.length; i++) this.fixedIndices.add(i);
+
+                while(toRemove > 0) {
+                    let idx = Math.floor(Math.random() * this.board.length);
+                    if(this.board[idx] !== 0) {
+                        this.board[idx] = 0;
+                        this.fixedIndices.delete(idx);
+                        toRemove--;
+                    }
                 }
             }
             
-            document.getElementById('mode-display').textContent = `${this.size}x${this.size}`;
-            document.getElementById('diff-display').textContent = this.difficulty.toUpperCase();
+            document.getElementById('mode-display').textContent = this.mode.toUpperCase();
+            document.getElementById('diff-display').textContent = this.mode === 'cage' ? 'CAGE 9x9' : this.difficulty.toUpperCase();
             this.updateLivesDisplay();
             this.saveGame();
             this.render();
             this.resumeGame();
         }, 50);
+    }
+
+    // SVG ve Bölgeleme Mantığı İçin Kafes Üretici
+    generateCages() {
+        let visited = new Set();
+        let cells = Array.from({length: 81}, (_, i) => i).sort(() => Math.random() - 0.5);
+
+        for (let i of cells) {
+            if (visited.has(i)) continue;
+
+            let targetSize = Math.floor(Math.random() * 4) + 2; // 2 ile 5 hücre arası
+            let currentCage = [i];
+            visited.add(i);
+
+            while (currentCage.length < targetSize) {
+                let neighbors = [];
+                for (let c of currentCage) {
+                    let r = Math.floor(c / 9), col = c % 9;
+                    if (r > 0 && !visited.has(c - 9)) neighbors.push(c - 9);
+                    if (r < 8 && !visited.has(c + 9)) neighbors.push(c + 9);
+                    if (col > 0 && !visited.has(c - 1)) neighbors.push(c - 1);
+                    if (col < 8 && !visited.has(c + 1)) neighbors.push(c + 1);
+                }
+
+                if (neighbors.length === 0) break;
+
+                let nextCell = neighbors[Math.floor(Math.random() * neighbors.length)];
+                currentCage.push(nextCell);
+                visited.add(nextCell);
+            }
+
+            let sum = currentCage.reduce((acc, val) => acc + this.solution[val], 0);
+
+            currentCage.sort((a, b) => {
+                let rA = Math.floor(a/9), cA = a%9, rB = Math.floor(b/9), cB = b%9;
+                if (rA !== rB) return rA - rB;
+                return cA - cB;
+            });
+
+            this.cages.push({
+                id: this.cages.length,
+                cells: currentCage,
+                targetSum: sum,
+                labelCell: currentCage[0]
+            });
+        }
+    }
+
+    getCageId(cellIdx) {
+        if (this.mode !== 'cage') return -1;
+        let cage = this.cages.find(c => c.cells.includes(cellIdx));
+        return cage ? cage.id : -1;
     }
 
     generateFullSolution() {
@@ -161,18 +221,70 @@ class Vildoku {
             if ((c + 1) % this.sqrt === 0 && c !== this.size - 1) cell.classList.add('thick-right');
             if ((r + 1) % this.sqrt === 0 && r !== this.size - 1) cell.classList.add('thick-bottom');
 
+            // Cage Etiketi Ekleme
+            if (this.mode === 'cage') {
+                let cage = this.cages.find(cg => cg.labelCell === i);
+                if (cage) {
+                    let sumSpan = document.createElement('span');
+                    sumSpan.className = 'cage-sum';
+                    sumSpan.id = `cage-label-${cage.id}`;
+                    sumSpan.textContent = cage.targetSum;
+                    
+                    // Kafes tam dolu ve doğruysa görsel geribildirim
+                    let isFull = cage.cells.every(idx => this.board[idx] !== 0);
+                    if (isFull) sumSpan.classList.add('cage-done');
+                    
+                    cell.appendChild(sumSpan);
+                }
+            }
+
             if (val !== 0) {
-                cell.textContent = this.valToChar(val);
+                const textNode = document.createTextNode(this.valToChar(val));
+                cell.appendChild(textNode);
                 cell.classList.add(this.fixedIndices.has(i) ? 'fixed' : 'user-val');
                 if (val !== this.solution[i]) cell.classList.add('error');
             }
+            
             if (this.selectedIdx === i) cell.classList.add('selected');
             if (val !== 0 && val === selVal) cell.classList.add('highlighted');
             
             cell.onclick = () => { this.selectedIdx = i; this.render(); };
             boardEl.appendChild(cell);
         });
+
+        this.renderCagesSVG();
         this.updateNumpad();
+    }
+
+    renderCagesSVG() {
+        const svg = document.getElementById('cage-layer');
+        svg.innerHTML = '';
+        if (this.mode !== 'cage') return;
+
+        // CSS Grid ile 1'e 1 eşleşen sanal bir düzlem
+        svg.setAttribute('viewBox', '0 0 90 90');
+
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                let i = r * 9 + c;
+                let myCage = this.getCageId(i);
+
+                if (c < 8 && myCage !== this.getCageId(i + 1)) {
+                    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute('x1', (c + 1) * 10); line.setAttribute('y1', r * 10);
+                    line.setAttribute('x2', (c + 1) * 10); line.setAttribute('y2', (r + 1) * 10);
+                    line.setAttribute('class', 'cage-line');
+                    svg.appendChild(line);
+                }
+                if (r < 8 && myCage !== this.getCageId(i + 9)) {
+                    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute('x1', c * 10); line.setAttribute('y1', (r + 1) * 10);
+                    line.setAttribute('x2', (c + 1) * 10); line.setAttribute('y2', (r + 1) * 10);
+                    line.setAttribute('class', 'cage-line');
+                    svg.appendChild(line);
+                }
+            }
+        }
     }
 
     valToChar(v) {
@@ -211,13 +323,13 @@ class Vildoku {
         const state = {
             board: this.board, solution: this.solution, fixedIndices: Array.from(this.fixedIndices),
             difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
-            size: this.size, sqrt: this.sqrt
+            size: this.size, sqrt: this.sqrt, cages: this.cages
         };
-        localStorage.setItem('vildoku_v5_save', JSON.stringify(state));
+        localStorage.setItem('vildoku_v6_save', JSON.stringify(state));
     }
 
     loadGame() {
-        const saved = localStorage.getItem('vildoku_v5_save');
+        const saved = localStorage.getItem('vildoku_v6_save');
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -229,10 +341,11 @@ class Vildoku {
         this.mistakes = data.mistakes || 0;
         this.size = data.size || 9;
         this.sqrt = data.sqrt || 3;
+        this.cages = data.cages || [];
         
         this.selectMode(this.mode);
-        document.getElementById('mode-display').textContent = `${this.size}x${this.size}`;
-        document.getElementById('diff-display').textContent = this.difficulty.toUpperCase();
+        document.getElementById('mode-display').textContent = this.mode.toUpperCase();
+        document.getElementById('diff-display').textContent = this.mode === 'cage' ? 'CAGE 9x9' : this.difficulty.toUpperCase();
         this.updateLivesDisplay();
         this.render();
         return true;
@@ -255,7 +368,6 @@ class Vildoku {
         document.getElementById('pause-view').classList.add('hidden');
         document.getElementById('new-game-view').classList.remove('hidden');
         
-        // Eğer zorunluysa (oyun başı veya can bitişi) iptal etme butonunu gizle
         if(forceNew) {
             document.getElementById('cancel-new-btn').classList.add('hidden');
         } else {
@@ -275,8 +387,8 @@ class Vildoku {
     checkWin() {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
-                alert(`Congratulations Vildan! You solved it!`);
-                localStorage.removeItem('vildoku_v5_save');
+                alert(`Congratulations Vildan! You mastered the ${this.mode.toUpperCase()} mode!`);
+                localStorage.removeItem('vildoku_v6_save');
                 this.showNewGameMenu(true);
             }, 100);
         }
