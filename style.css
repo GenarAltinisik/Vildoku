@@ -55,7 +55,7 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
     position: relative; background: var(--surface); display: flex; justify-content: center; align-items: center;
     font-size: calc(1.5rem / (var(--grid-size) / 7)); cursor: pointer; font-family: sans-serif;
     border-right: 1px solid var(--grid); border-bottom: 1px solid var(--grid);
-    line-height: 1; /* Hücrenin esnemesini kesin engeller */
+    line-height: 1; 
 }
 
 .cell:nth-child(var(--grid-size)n) { border-right: none; }
@@ -70,7 +70,7 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
 .thick-right { border-right: 2px solid var(--grid-thick) !important; }
 .thick-bottom { border-bottom: 2px solid var(--grid-thick) !important; }
 
-/* CSS Tabanlı, Hatasız Cage (Kafes) Çizgileri */
+/* CSS Tabanlı Kafes Çizgileri */
 .cage-b-r::after {
     content: ''; position: absolute; top: 0; right: -1px; bottom: 0;
     border-right: 2px dashed var(--cage-line); z-index: 5; pointer-events: none;
@@ -80,7 +80,6 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
     border-bottom: 2px dashed var(--cage-line); z-index: 5; pointer-events: none;
 }
 
-/* Küçük ekranda sayıyla köşedeki değer karışmasın diye ufak arkaplan maskesi */
 .cage-sum {
     position: absolute; top: 2px; left: 2px; font-size: 0.65rem; color: var(--text);
     font-family: 'Courier New', Courier, monospace; font-weight: bold; pointer-events: none;
@@ -111,7 +110,6 @@ body[data-size="16"] .num-btn { flex: 0 0 calc(12.5% - 6px); }
 .action-btn.delete { color: var(--error); border-color: var(--error); }
 
 .overlay { position: fixed; inset: 0; background: rgba(18, 18, 18, 0.95); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.overlay.hidden { display: none !important; }
 .modal { background: var(--surface); padding: 30px 20px; border: 1px solid var(--grid); text-align: center; width: 90%; max-width: 400px; }
 .menu-label { margin: 15px 0 10px 0; color: var(--text-muted); }
 .picker-group { display: flex; flex-direction: column; gap: 10px; }
@@ -124,6 +122,9 @@ body[data-size="16"] .num-btn { flex: 0 0 calc(12.5% - 6px); }
 .menu-btn.active, .diff-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(94, 234, 212, 0.05); }
 
 .main-btn { width: 100%; padding: 15px; background: var(--primary); color: var(--bg); border: none; font-family: inherit; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
-.main-btn.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--grid); margin-top: 10px; }
+.main-btn.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--grid); }
 .main-btn.transparent { background: transparent; color: var(--text-muted); border: none; font-size: 0.9rem; }
 .mt-20 { margin-top: 20px; } .mt-10 { margin-top: 10px; }
+
+/* Hiçbir stilin bunu ezmemesi için daha katı bir gizleme kuralı */
+.hidden, #pause-view.hidden, #new-game-view.hidden { display: none !important; }

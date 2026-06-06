@@ -219,7 +219,6 @@ class Vildoku {
             if ((c + 1) % this.sqrt === 0 && c !== this.size - 1) cell.classList.add('thick-right');
             if ((r + 1) % this.sqrt === 0 && r !== this.size - 1) cell.classList.add('thick-bottom');
 
-            // Yeni CSS Tabanlı Cage Sınırları
             if (this.mode === 'cage') {
                 let myCage = this.getCageId(i);
                 
@@ -299,11 +298,11 @@ class Vildoku {
             difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
             size: this.size, sqrt: this.sqrt, cages: this.cages
         };
-        localStorage.setItem('vildoku_v7_save', JSON.stringify(state));
+        localStorage.setItem('vildoku_v8_save', JSON.stringify(state));
     }
 
     loadGame() {
-        const saved = localStorage.getItem('vildoku_v7_save');
+        const saved = localStorage.getItem('vildoku_v8_save');
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -332,18 +331,24 @@ class Vildoku {
     showPauseMenu() {
         this.isPaused = true;
         document.getElementById('modal-title').textContent = "PAUSED";
+        
+        // PAUSE görünümünü aç, YENİ OYUN görünümünü gizle
         document.getElementById('pause-view').classList.remove('hidden');
         document.getElementById('new-game-view').classList.add('hidden');
+        
         document.getElementById('overlay').classList.remove('hidden');
     }
 
     showNewGameMenu(forceNew = false) {
         document.getElementById('modal-title').textContent = "NEW GAME";
+        
+        // PAUSE görünümünü gizle, YENİ OYUN görünümünü aç
         document.getElementById('pause-view').classList.add('hidden');
         document.getElementById('new-game-view').classList.remove('hidden');
         
         if(forceNew) {
             document.getElementById('cancel-new-btn').classList.add('hidden');
+            document.getElementById('overlay').classList.remove('hidden');
         } else {
             document.getElementById('cancel-new-btn').classList.remove('hidden');
         }
@@ -362,7 +367,7 @@ class Vildoku {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
                 alert(`Congratulations Vildan! You mastered the ${this.mode.toUpperCase()} mode!`);
-                localStorage.removeItem('vildoku_v7_save');
+                localStorage.removeItem('vildoku_v8_save');
                 this.showNewGameMenu(true);
             }, 100);
         }
