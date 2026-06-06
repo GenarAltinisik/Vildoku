@@ -55,7 +55,7 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
     position: relative; background: var(--surface); display: flex; justify-content: center; align-items: center;
     font-size: calc(1.5rem / (var(--grid-size) / 7)); cursor: pointer; font-family: sans-serif;
     border-right: 1px solid var(--grid); border-bottom: 1px solid var(--grid);
-    line-height: 1; 
+    line-height: 1; transition: background 0.2s;
 }
 
 .cell:nth-child(var(--grid-size)n) { border-right: none; }
@@ -63,14 +63,28 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
 
 .cell.fixed { color: var(--text); font-weight: normal; }
 .cell.user-val { color: var(--primary); font-weight: bold; }
-.cell.selected { background: var(--selected); }
-.cell.highlighted { background: var(--highlight); }
-.cell.error { color: var(--error); background: var(--error-bg); }
+
+/* Seçim ve vurguların pastel renkleri ezmemesi için !important kullanıldı */
+.cell.selected { background: var(--selected) !important; }
+.cell.highlighted { background: var(--highlight) !important; }
+.cell.error { color: var(--error); background: var(--error-bg) !important; }
 
 .thick-right { border-right: 2px solid var(--grid-thick) !important; }
 .thick-bottom { border-bottom: 2px solid var(--grid-thick) !important; }
 
-/* CSS Tabanlı Kafes Çizgileri */
+/* PASTEL KAFES RENKLERİ (Dark modda sırıtmayacak transparanlıkta) */
+.cage-color-0 { background-color: rgba(255, 179, 186, 0.15); } /* Pastel Kırmızı/Gül */
+.cage-color-1 { background-color: rgba(255, 223, 186, 0.15); } /* Pastel Turuncu */
+.cage-color-2 { background-color: rgba(255, 255, 186, 0.15); } /* Pastel Sarı */
+.cage-color-3 { background-color: rgba(186, 255, 201, 0.15); } /* Pastel Yeşil */
+.cage-color-4 { background-color: rgba(186, 225, 255, 0.15); } /* Pastel Mavi */
+.cage-color-5 { background-color: rgba(210, 186, 255, 0.15); } /* Pastel Mor */
+.cage-color-6 { background-color: rgba(255, 186, 255, 0.15); } /* Pastel Pembe */
+.cage-color-7 { background-color: rgba(186, 255, 255, 0.15); } /* Pastel Turkuaz */
+.cage-color-8 { background-color: rgba(220, 220, 220, 0.15); } /* Gümüş */
+.cage-color-9 { background-color: rgba(255, 204, 153, 0.15); } /* Şeftali */
+
+/* Kafes Çizgileri */
 .cage-b-r::after {
     content: ''; position: absolute; top: 0; right: -1px; bottom: 0;
     border-right: 2px dashed var(--cage-line); z-index: 5; pointer-events: none;
@@ -80,12 +94,13 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
     border-bottom: 2px dashed var(--cage-line); z-index: 5; pointer-events: none;
 }
 
+/* Kafes Sayı Etiketi Arkaplanı */
 .cage-sum {
     position: absolute; top: 2px; left: 2px; font-size: 0.65rem; color: var(--text);
     font-family: 'Courier New', Courier, monospace; font-weight: bold; pointer-events: none;
-    background: var(--surface); padding: 0 2px; border-radius: 2px; z-index: 10;
+    background: rgba(30, 30, 30, 0.85); padding: 0 3px; border-radius: 3px; z-index: 10;
 }
-.cage-done { color: var(--success); opacity: 0.5; }
+.cage-done { color: var(--success); opacity: 0.6; }
 .cell-value { z-index: 1; }
 
 .numpad { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 10px; }
@@ -125,6 +140,4 @@ body[data-size="16"] .num-btn { flex: 0 0 calc(12.5% - 6px); }
 .main-btn.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--grid); }
 .main-btn.transparent { background: transparent; color: var(--text-muted); border: none; font-size: 0.9rem; }
 .mt-20 { margin-top: 20px; } .mt-10 { margin-top: 10px; }
-
-/* Hiçbir stilin bunu ezmemesi için daha katı bir gizleme kuralı */
 .hidden, #pause-view.hidden, #new-game-view.hidden { display: none !important; }

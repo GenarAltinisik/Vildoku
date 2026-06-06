@@ -144,6 +144,30 @@ class Vildoku {
                 labelCell: currentCage[0]
             });
         }
+
+        // Yan yana gelen kafeslerin aynı renkte olmasını engelleyen Graph Coloring Algoritması
+        this.cages.forEach(cage => {
+            let adjacentColors = new Set();
+            cage.cells.forEach(cellIdx => {
+                let r = Math.floor(cellIdx / 9), c = cellIdx % 9;
+                let neighbors = [cellIdx - 9, cellIdx + 9, cellIdx - 1, cellIdx + 1].filter(n => {
+                    if (n < 0 || n >= 81) return false;
+                    let nR = Math.floor(n / 9), nC = n % 9;
+                    return (Math.abs(r - nR) + Math.abs(c - nC)) === 1; 
+                });
+
+                neighbors.forEach(nIdx => {
+                    let neighborCage = this.cages.find(cg => cg.cells.includes(nIdx));
+                    if (neighborCage && neighborCage.id !== cage.id && neighborCage.colorIndex !== undefined) {
+                        adjacentColors.add(neighborCage.colorIndex);
+                    }
+                });
+            });
+
+            let color = 0;
+            while(adjacentColors.has(color)) color++;
+            cage.colorIndex = color % 10; // CSS'te hazırladığımız 10 farklı pastel renk
+        });
     }
 
     getCageId(cellIdx) {
@@ -220,8 +244,14 @@ class Vildoku {
             if ((r + 1) % this.sqrt === 0 && r !== this.size - 1) cell.classList.add('thick-bottom');
 
             if (this.mode === 'cage') {
-                let myCage = this.getCageId(i);
+                let myCageObj = this.cages.find(cg => cg.cells.includes(i));
+                let myCage = myCageObj ? myCageObj.id : -1;
                 
+                // Arkaplana Atanmış Pastel Rengi Ekle
+                if (myCageObj !== undefined) {
+                    cell.classList.add(`cage-color-${myCageObj.colorIndex}`);
+                }
+
                 if (c < this.size - 1 && myCage !== this.getCageId(i + 1)) {
                     cell.classList.add('cage-b-r');
                 }
@@ -229,12 +259,11 @@ class Vildoku {
                     cell.classList.add('cage-b-b');
                 }
 
-                let cageObj = this.cages.find(cg => cg.labelCell === i);
-                if (cageObj) {
+                if (myCageObj && myCageObj.labelCell === i) {
                     let sumSpan = document.createElement('span');
                     sumSpan.className = 'cage-sum';
-                    sumSpan.textContent = cageObj.targetSum;
-                    let isFull = cageObj.cells.every(idx => this.board[idx] !== 0);
+                    sumSpan.textContent = myCageObj.targetSum;
+                    let isFull = myCageObj.cells.every(idx => this.board[idx] !== 0);
                     if (isFull) sumSpan.classList.add('cage-done');
                     cell.appendChild(sumSpan);
                 }
@@ -298,11 +327,11 @@ class Vildoku {
             difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
             size: this.size, sqrt: this.sqrt, cages: this.cages
         };
-        localStorage.setItem('vildoku_v8_save', JSON.stringify(state));
+        localStorage.setItem('vildoku_v9_save', JSON.stringify(state));
     }
 
     loadGame() {
-        const saved = localStorage.getItem('vildoku_v8_save');
+        const saved = localStorage.getItem('vildoku_v9_save');
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -332,7 +361,6 @@ class Vildoku {
         this.isPaused = true;
         document.getElementById('modal-title').textContent = "PAUSED";
         
-        // PAUSE görünümünü aç, YENİ OYUN görünümünü gizle
         document.getElementById('pause-view').classList.remove('hidden');
         document.getElementById('new-game-view').classList.add('hidden');
         
@@ -342,7 +370,6 @@ class Vildoku {
     showNewGameMenu(forceNew = false) {
         document.getElementById('modal-title').textContent = "NEW GAME";
         
-        // PAUSE görünümünü gizle, YENİ OYUN görünümünü aç
         document.getElementById('pause-view').classList.add('hidden');
         document.getElementById('new-game-view').classList.remove('hidden');
         
@@ -367,7 +394,7 @@ class Vildoku {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
                 alert(`Congratulations Vildan! You mastered the ${this.mode.toUpperCase()} mode!`);
-                localStorage.removeItem('vildoku_v8_save');
+                localStorage.removeItem('vildoku_v9_save');
                 this.showNewGameMenu(true);
             }, 100);
         }
