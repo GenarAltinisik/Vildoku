@@ -9,15 +9,17 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
-<body>
+<body data-size="9">
     <div class="app-container">
         <header>
-            <h1 id="game-title">VILDOKU</h1>
+            <div class="header-top">
+                <h1 id="game-title">VILDOKU</h1>
+                <button id="pause-btn" class="text-icon-btn">PAUSE</button>
+            </div>
             <div class="stats-bar">
                 <div class="stat-item"><span id="mode-display">9x9</span> | <span id="diff-display">HARD</span></div>
                 <div class="stat-item"><span id="timer">00:00</span></div>
-                <div class="stat-item" id="lives-container">Mistakes Left: 3/3</div>
-                <button id="pause-btn" class="icon-btn">⏸</button>
+                <div class="stat-item" id="lives-container">Mistakes: 0/3</div>
             </div>
         </header>
 
@@ -27,14 +29,19 @@
             <div class="numpad" id="numpad"></div>
             <div class="action-bar">
                 <button class="action-btn delete" id="delete-btn">DELETE</button>
-                <button class="action-btn new-game" id="new-game-btn">MODES</button>
             </div>
         </section>
 
         <div id="overlay" class="overlay">
             <div class="modal">
-                <h2 id="modal-title">Vildoku</h2>
-                <div id="menu-content">
+                <h2 id="modal-title">PAUSED</h2>
+                
+                <div id="pause-view">
+                    <button id="resume-btn" class="main-btn">RESUME</button>
+                    <button id="show-new-game-btn" class="main-btn secondary">NEW GAME</button>
+                </div>
+
+                <div id="new-game-view" class="hidden">
                     <p class="menu-label">Select Game Mode:</p>
                     <div class="picker-group">
                         <button class="menu-btn" id="btn-classic">CLASSIC (9x9)</button>
@@ -48,7 +55,8 @@
                         <button class="diff-btn" onclick="game.selectDifficulty('hard')">HARD</button>
                     </div>
                     
-                    <button id="resume-btn" class="resume-btn hidden">RESUME</button>
+                    <button id="start-new-btn" class="main-btn mt-20">START GAME</button>
+                    <button id="cancel-new-btn" class="main-btn transparent mt-10">CANCEL</button>
                 </div>
             </div>
         </div>
