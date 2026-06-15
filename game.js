@@ -126,10 +126,6 @@ class Vildoku {
             let r = Math.random();
             
             if (this.mode === 'cagehex') {
-<<<<<<< HEAD
-=======
-                // Cage Hex (16x16) dengelenmiş yeni dağılımı
->>>>>>> 793950082119d7f84c4e187470f58c6aaca75326
                 if (this.difficulty === 'easy') {
                     targetSize = r < 0.45 ? 1 : (r < 0.85 ? 2 : 3);
                 } else if (this.difficulty === 'medium') {
@@ -138,10 +134,6 @@ class Vildoku {
                     targetSize = r < 0.40 ? 2 : (r < 0.75 ? 3 : (r < 0.95 ? 4 : 5));
                 }
             } else {
-<<<<<<< HEAD
-=======
-                // Cage 9x9 dağılımı
->>>>>>> 793950082119d7f84c4e187470f58c6aaca75326
                 if (this.difficulty === 'easy') {
                     targetSize = r < 0.40 ? 1 : (r < 0.85 ? 2 : 3);
                 } else if (this.difficulty === 'medium') {
@@ -175,11 +167,7 @@ class Vildoku {
 
             // Hatanın çözüldüğü kısım: "size" yerine "this.size" kullanıldı
             currentCage.sort((a, b) => {
-<<<<<<< HEAD
                 let rA = Math.floor(a/this.size), cA = a%this.size, rB = Math.floor(b/this.size), cB = b%this.size;
-=======
-                let rA = Math.floor(a/this.size), cA = a%this.size, rB = Math.floor(b/size), cB = b%this.size;
->>>>>>> 793950082119d7f84c4e187470f58c6aaca75326
                 if (rA !== rB) return rA - rB;
                 return cA - cB;
             });
@@ -192,7 +180,6 @@ class Vildoku {
             });
         }
 
-        // Komşuluk renk kontrolü (Graph Coloring)
         this.cages.forEach(cage => {
             let adjacentColors = new Set();
             cage.cells.forEach(cellIdx => {
@@ -373,19 +360,11 @@ class Vildoku {
             difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
             size: this.size, sqrt: this.sqrt, cages: this.cages
         };
-<<<<<<< HEAD
         localStorage.setItem('vildoku_v14_save', JSON.stringify(state));
     }
 
     loadGame() {
         const saved = localStorage.getItem('vildoku_v14_save');
-=======
-        localStorage.setItem('vildoku_v13_save', JSON.stringify(state));
-    }
-
-    loadGame() {
-        const saved = localStorage.getItem('vildoku_v13_save');
->>>>>>> 793950082119d7f84c4e187470f58c6aaca75326
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -444,13 +423,8 @@ class Vildoku {
     checkWin() {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
-<<<<<<< HEAD
                 alert(`Congratulations! You mastered the ${this.mode.toUpperCase()} mode!`);
                 localStorage.removeItem('vildoku_v14_save');
-=======
-                alert(`Congratulations Vildan! You mastered the ${this.mode.toUpperCase()} mode!`);
-                localStorage.removeItem('vildoku_v13_save');
->>>>>>> 793950082119d7f84c4e187470f58c6aaca75326
                 this.showNewGameMenu(true);
             }, 100);
         }
