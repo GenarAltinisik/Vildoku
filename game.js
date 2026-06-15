@@ -80,7 +80,6 @@ class Vildoku {
                 this.generateCages();
                 this.board = Array(this.size * this.size).fill(0); 
                 
-                // 1 hücreli kafesleri oyun başında otomatik doldurur
                 this.cages.forEach(cage => {
                     if (cage.cells.length === 1) {
                         let cellIdx = cage.cells[0];
@@ -165,7 +164,6 @@ class Vildoku {
 
             let sum = currentCage.reduce((acc, val) => acc + this.solution[val], 0);
 
-            // Hatanın çözüldüğü kısım: "size" yerine "this.size" kullanıldı
             currentCage.sort((a, b) => {
                 let rA = Math.floor(a/this.size), cA = a%this.size, rB = Math.floor(b/this.size), cB = b%this.size;
                 if (rA !== rB) return rA - rB;
@@ -360,11 +358,11 @@ class Vildoku {
             difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
             size: this.size, sqrt: this.sqrt, cages: this.cages
         };
-        localStorage.setItem('vildoku_v14_save', JSON.stringify(state));
+        localStorage.setItem('vildoku_v15_save', JSON.stringify(state));
     }
 
     loadGame() {
-        const saved = localStorage.getItem('vildoku_v14_save');
+        const saved = localStorage.getItem('vildoku_v15_save');
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -424,7 +422,7 @@ class Vildoku {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
                 alert(`Congratulations! You mastered the ${this.mode.toUpperCase()} mode!`);
-                localStorage.removeItem('vildoku_v14_save');
+                localStorage.removeItem('vildoku_v15_save');
                 this.showNewGameMenu(true);
             }, 100);
         }
