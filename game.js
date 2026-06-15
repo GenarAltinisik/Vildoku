@@ -283,12 +283,16 @@ class Vildoku {
                     cell.classList.add(`cage-color-${myCageObj.colorIndex}`);
                 }
 
-                if (c < this.size - 1 && myCage !== this.getCageId(i + 1)) {
-                    cell.classList.add('cage-b-r');
-                }
-                if (r < this.size - 1 && myCage !== this.getCageId(i + this.size)) {
-                    cell.classList.add('cage-b-b');
-                }
+                // Her hücre kendi 4 yönüne bakıp kendi iç kenarlığını çizer
+                if (r === 0 || myCage !== this.getCageId(i - this.size)) cell.classList.add('cage-b-t');
+                if (r === this.size - 1 || myCage !== this.getCageId(i + this.size)) cell.classList.add('cage-b-b');
+                if (c === 0 || myCage !== this.getCageId(i - 1)) cell.classList.add('cage-b-l');
+                if (c === this.size - 1 || myCage !== this.getCageId(i + 1)) cell.classList.add('cage-b-r');
+
+                // Bağımsız Sınır Çizgisi Katmanı Ekle
+                let borderLayer = document.createElement('div');
+                borderLayer.className = 'cage-border-layer';
+                cell.appendChild(borderLayer);
 
                 if (myCageObj && myCageObj.labelCell === i) {
                     let sumSpan = document.createElement('span');
@@ -358,11 +362,12 @@ class Vildoku {
             difficulty: this.difficulty, mode: this.mode, seconds: this.seconds, mistakes: this.mistakes,
             size: this.size, sqrt: this.sqrt, cages: this.cages
         };
-        localStorage.setItem('vildoku_v15_save', JSON.stringify(state));
+        // Yeniliklerin yansıması için localStorage anahtarı güncellendi
+        localStorage.setItem('vildoku_v16_save', JSON.stringify(state));
     }
 
     loadGame() {
-        const saved = localStorage.getItem('vildoku_v15_save');
+        const saved = localStorage.getItem('vildoku_v16_save');
         if (!saved) return false;
         const data = JSON.parse(saved);
         this.board = data.board;
@@ -421,8 +426,8 @@ class Vildoku {
     checkWin() {
         if(!this.board.includes(0) && !this.board.some((v, i) => v !== this.solution[i])) {
             setTimeout(() => {
-                alert(`Congratulations! You mastered the ${this.mode.toUpperCase()} mode!`);
-                localStorage.removeItem('vildoku_v15_save');
+                alert(`Congratulations Vildan! You mastered the ${this.mode.toUpperCase()} mode!`);
+                localStorage.removeItem('vildoku_v16_save');
                 this.showNewGameMenu(true);
             }, 100);
         }
