@@ -4,14 +4,13 @@
     --text: #e0e0e0;
     --text-muted: #888888;
     --grid: #383838;
-    --grid-thick: #999999;
+    --grid-thick: #aaaaaa;
     --primary: #5eead4;
-    --highlight: rgba(94, 234, 212, 0.25);
+    --highlight: #223330;
     --selected: #2d5a53;
     --error: #fca5a5;
     --error-bg: #3b1e1e;
     --success: #86efac;
-    --cage-unified-line: rgba(255, 255, 255, 0.5); /* Tüm kafesler için tek, temiz ve net renk */
     --grid-size: 9;
 }
 
@@ -64,48 +63,78 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
 
 .cell.fixed { color: var(--text); font-weight: normal; }
 .cell.user-val { color: var(--primary); font-weight: bold; }
-
-.cell.selected { background: var(--selected) !important; }
 .cell.error { color: var(--error); background: var(--error-bg) !important; }
 
-/* Daha Belirgin Vurgu (Highlight) Efekti */
+/* --- TIKLANAN HÜCRE (Kusursuz Belirginlik) --- */
+.cell.selected { 
+    background: var(--primary) !important; 
+    box-shadow: 0 0 15px rgba(94, 234, 212, 0.6) !important;
+    z-index: 20 !important; 
+}
+.cell.selected .cell-value { 
+    color: var(--bg) !important; 
+    text-shadow: none !important;
+}
+.cell.selected .cage-sum {
+    color: var(--bg) !important;
+    background: transparent !important; /* Arkaplanı şeffaf yap ki çirkin durmasın */
+}
+
+/* --- EŞLEŞEN DİĞER SAYILAR (Parlama ve Büyüme Efekti) --- */
 .cell.highlighted { 
-    background: var(--highlight) !important; 
-    box-shadow: inset 0 0 10px rgba(94, 234, 212, 0.4) !important;
+    /* Pastel rengi tamamen silmeden üzerine koyu bir filtre atarak yazıyı öne çıkarır */
+    background-color: rgba(0, 0, 0, 0.65) !important; 
+    outline: 2px solid var(--primary) !important; 
+    outline-offset: -2px;
+    z-index: 15 !important;
 }
 .cell.highlighted .cell-value {
     color: #ffffff !important;
-    text-shadow: 0 0 8px var(--primary);
+    text-shadow: 0 0 8px var(--primary), 0 0 15px var(--primary) !important;
+    transform: scale(1.4); /* Rakamı %40 büyütür, gözden kaçması imkansız olur */
+    display: inline-block; /* Büyütme efektinin çalışması için gerekli */
+    font-weight: 900 !important;
+    transition: transform 0.1s ease;
 }
 
-/* 3x3 ve 4x4 Ana Blok Sınırları */
+/* 3x3 ve 4x4 Blok Sınırları */
 .thick-right { border-right: 3px solid var(--grid-thick) !important; }
 .thick-bottom { border-bottom: 3px solid var(--grid-thick) !important; }
 
-/* MİNİMALİST, TEK RENK KAFES ÇİZGİLERİ (Background Color İptal Edildi) */
+/* DİNAMİK RENKLER - Arkaplan Pastel, Çizgiler Çok Daha Canlı (Belirgin) */
+.cage-color-0 { --c-border: rgb(255, 110, 120); background-color: rgba(255, 179, 186, 0.12); } 
+.cage-color-1 { --c-border: rgb(255, 160, 80);  background-color: rgba(255, 223, 186, 0.12); } 
+.cage-color-2 { --c-border: rgb(230, 220, 80);  background-color: rgba(255, 255, 186, 0.12); } 
+.cage-color-3 { --c-border: rgb(100, 220, 130); background-color: rgba(186, 255, 201, 0.12); } 
+.cage-color-4 { --c-border: rgb(100, 180, 255); background-color: rgba(186, 225, 255, 0.12); } 
+.cage-color-5 { --c-border: rgb(170, 120, 255); background-color: rgba(210, 186, 255, 0.12); } 
+.cage-color-6 { --c-border: rgb(255, 110, 255); background-color: rgba(255, 186, 255, 0.12); } 
+.cage-color-7 { --c-border: rgb(80, 220, 220);  background-color: rgba(186, 255, 255, 0.12); } 
+.cage-color-8 { --c-border: rgb(200, 200, 200); background-color: rgba(220, 220, 220, 0.12); } 
+.cage-color-9 { --c-border: rgb(255, 140, 80);  background-color: rgba(255, 204, 153, 0.12); } 
+
+/* ÇİFT TARAFLI (BAĞIMSIZ) İÇ KENARLIK MEKANİZMASI */
 .cage-border-layer {
     position: absolute;
-    inset: 3px; /* Çizgiler ızgaradan biraz daha içeri alındı, daha temiz durur */
+    inset: 2px;
     border-style: dashed;
-    border-color: var(--cage-unified-line);
+    border-color: var(--c-border);
     border-width: 0;
     z-index: 5;
     pointer-events: none;
 }
 
-/* Tüm kafesler için sabit, okunaklı 2px kalınlık */
-.cage-b-t > .cage-border-layer { border-top-width: 2px; }
-.cage-b-b > .cage-border-layer { border-bottom-width: 2px; }
-.cage-b-l > .cage-border-layer { border-left-width: 2px; }
-.cage-b-r > .cage-border-layer { border-right-width: 2px; }
+.cage-b-t > .cage-border-layer { border-top-width: 2.5px; }
+.cage-b-b > .cage-border-layer { border-bottom-width: 2.5px; }
+.cage-b-l > .cage-border-layer { border-left-width: 2.5px; }
+.cage-b-r > .cage-border-layer { border-right-width: 2.5px; }
 
 .cell-value { position: relative; z-index: 10; }
 
-/* Kafes Hedef Sayıları */
 .cage-sum {
-    position: absolute; top: 1px; left: 2px; font-size: calc(0.65rem / (var(--grid-size) / 8)); color: var(--text);
+    position: absolute; top: 1px; left: 1px; font-size: calc(0.65rem / (var(--grid-size) / 8)); color: var(--text);
     font-family: 'Courier New', Courier, monospace; font-weight: bold; pointer-events: none;
-    background: var(--surface); padding: 0 2px; border-radius: 2px; z-index: 10;
+    background: rgba(30, 30, 30, 0.85); padding: 0 2px; border-radius: 2px; z-index: 10;
 }
 .cage-done { color: var(--success); opacity: 0.6; }
 
