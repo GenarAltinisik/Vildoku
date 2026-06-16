@@ -6,7 +6,7 @@
     --grid: #383838;
     --grid-thick: #aaaaaa;
     --primary: #5eead4;
-    --highlight: #223330;
+    --highlight: rgba(94, 234, 212, 0.25); /* Vurgu rengi belirginleştirildi */
     --selected: #2d5a53;
     --error: #fca5a5;
     --error-bg: #3b1e1e;
@@ -65,8 +65,17 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
 .cell.user-val { color: var(--primary); font-weight: bold; }
 
 .cell.selected { background: var(--selected) !important; }
-.cell.highlighted { background: var(--highlight) !important; }
 .cell.error { color: var(--error); background: var(--error-bg) !important; }
+
+/* YENİ VE DAHA BELİRGİN VURGU (HIGHLIGHT) EFEKTİ */
+.cell.highlighted { 
+    background: var(--highlight) !important; 
+    box-shadow: inset 0 0 10px rgba(94, 234, 212, 0.4) !important;
+}
+.cell.highlighted .cell-value {
+    color: #ffffff !important;
+    text-shadow: 0 0 8px var(--primary);
+}
 
 /* 3x3 ve 4x4 Blok Sınırları */
 .thick-right { border-right: 3px solid var(--grid-thick) !important; }
@@ -87,21 +96,19 @@ header h1 { margin: 0; letter-spacing: 6px; font-size: 1.8rem; color: var(--text
 /* ÇİFT TARAFLI (BAĞIMSIZ) İÇ KENARLIK MEKANİZMASI */
 .cage-border-layer {
     position: absolute;
-    inset: 2px; /* Hücreden 2px içeri çekildi, yan yana çift çizgi oluşturur */
+    inset: 2px;
     border-style: dashed;
     border-color: var(--c-border);
-    border-width: 0; /* JS ile dinamik olarak atanacak */
+    border-width: 0;
     z-index: 5;
     pointer-events: none;
 }
 
-/* Kalınlık 2.5px yapılarak çizgiler devasa hale getirildi */
 .cage-b-t > .cage-border-layer { border-top-width: 2.5px; }
 .cage-b-b > .cage-border-layer { border-bottom-width: 2.5px; }
 .cage-b-l > .cage-border-layer { border-left-width: 2.5px; }
 .cage-b-r > .cage-border-layer { border-right-width: 2.5px; }
 
-/* Yazıların çizgilerin altında kalmasını engeller */
 .cell-value { position: relative; z-index: 10; }
 
 .cage-sum {
