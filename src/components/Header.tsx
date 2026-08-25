@@ -83,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
             onPress={onOpenStats}
             activeOpacity={0.7}
           >
-            <Trophy size={20} color={THEME.neonGold} />
+            <Trophy size={18} color={THEME.neonGold} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -91,12 +91,12 @@ export const Header: React.FC<HeaderProps> = ({
             onPress={onOpenModeSelect}
             activeOpacity={0.7}
           >
-            <Grid size={20} color={THEME.textMuted} />
+            <Grid size={18} color={THEME.textMuted} />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Info Status Bar (Difficulty, Mistakes/Lives, Timer) */}
+      {/* Info Status Bar (Difficulty, Mistakes/Lives, Timer seamlessly matching AMOLED background) */}
       <View style={styles.statusBar}>
         <View style={styles.difficultyTag}>
           <Text style={styles.difficultyText}>{getDifficultyLabel()}</Text>
@@ -109,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({
             {Array.from({ length: maxMistakes }).map((_, i) => (
               <Heart
                 key={i}
-                size={16}
+                size={15}
                 color={i < mistakes ? THEME.neonRed : THEME.neonCyan}
                 fill={i < mistakes ? THEME.errorCellBg : THEME.neonCyan}
                 style={styles.heartIcon}
@@ -118,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
           </View>
         </View>
 
-        {/* Timer & Pause Button */}
+        {/* Timer & Pause Button (Clean AMOLED dark background) */}
         <TouchableOpacity
           style={styles.timerBtn}
           onPress={onTogglePause}
@@ -126,9 +126,9 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Text style={styles.timerText}>{formatTime(timer)}</Text>
           {isPaused ? (
-            <Play size={16} color={THEME.neonGreen} />
+            <Play size={15} color={THEME.neonGreen} />
           ) : (
-            <Pause size={16} color={THEME.textMuted} />
+            <Pause size={15} color={THEME.textMuted} />
           )}
         </TouchableOpacity>
       </View>
@@ -139,21 +139,21 @@ export const Header: React.FC<HeaderProps> = ({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 8,
+    paddingTop: 6,
+    paddingBottom: 4,
     backgroundColor: THEME.bg,
   },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   modeSelectorBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: THEME.bgElevated,
-    paddingVertical: 6,
+    paddingVertical: 5,
     paddingHorizontal: 12,
     borderRadius: 20,
     borderWidth: 1,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   logoText: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '900',
     letterSpacing: 1.2,
     color: THEME.text,
@@ -188,9 +188,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   iconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     backgroundColor: THEME.bgElevated,
     alignItems: 'center',
     justifyContent: 'center',
@@ -201,21 +201,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: THEME.surface,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: THEME.border,
+    backgroundColor: THEME.bg, // Matches app AMOLED background seamlessly
+    paddingHorizontal: 4,
+    paddingVertical: 4,
   },
   difficultyTag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: THEME.bgElevated,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
+    borderWidth: 1,
+    borderColor: THEME.border,
   },
   difficultyText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: THEME.textMuted,
     textTransform: 'uppercase',
@@ -223,7 +222,7 @@ const styles = StyleSheet.create({
   mistakesContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
   },
   statusLabel: {
     fontSize: 12,
@@ -242,7 +241,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: THEME.bgElevated,
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
