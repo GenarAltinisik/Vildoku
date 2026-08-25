@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Vildoku - Cage Sudoku",
+    "slug": "vildoku",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#090d16",
+    "splash": {
+      "backgroundColor": "#090d16",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vildoku.game"
+    },
+    "android": {
+      "package": "com.vildoku.game",
+      "adaptiveIcon": {
+        "backgroundColor": "#090d16",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "experiments": {
+      "baseUrl": "/Vildoku"
+    }
+  }
+}
